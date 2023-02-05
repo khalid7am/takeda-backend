@@ -1,0 +1,20 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  only:
+    - develop
+    - master
+  image:
+    name: debreczeniandras/deployerphp:7-beta
+    entrypoint: [""]
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+    - echo "${SSH_PRIVATE_KEY}" >> ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval $(ssh-agent -s)
+  script:
+    - dep deploy -v --branch ${CI_COMMIT_REF_NAME}
+    - dep configure -v --branch ${CI_COMMIT_REF_NAME}
